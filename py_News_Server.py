@@ -88,6 +88,8 @@ def scrape_article(news_site, article_url, paragraph_class):
     # Scrape First Image
     if news_site == "BBC":
         first_image = parser.find("img")["src"]
+        if not first_image.endswith("jpg"):
+            first_image = "https://ichef.bbci.co.uk/images/ic/1920xn/p09xtmrp.jpg"
     elif news_site == "Guardian":
         first_image = parser.find("img", class_="dcr-evn1e9")
         if first_image is not None:
@@ -181,11 +183,6 @@ def setup_scraping():
         scrape_urls("BBC")
         scrape_urls("Guardian")
         scrape_urls("SKY")
-
-        # Remove Duplicates created as homepages have duplicate links with Pandas
-        dataframe = pd.read_csv(filepath, encoding='ISO-8859-1')
-        removed_duplicates = dataframe.drop_duplicates()
-        removed_duplicates.to_csv(filepath, index=False, encoding='ISO-8859-1')
 
         sleep(1800)
 
