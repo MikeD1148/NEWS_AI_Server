@@ -158,18 +158,25 @@ def start_server():
 def setup_scraping():
 
     while True:
+        # Poll every 30 minutes for new articles
+        scrape_urls("BBC")
+        scrape_urls("Guardian")
+        scrape_urls("SKY")
+
         # Get 1 day ago
         day_old = datetime.now() - timedelta(days=1)
 
         # Read file of saved Classified Articles
         with open(filepath, "r") as file:
-            # Create file reader and List of Articles to keep
+            # Create file reader and List of Articles to keep and Set of Articles for unique urls
+            duplicate_articles = set()
             articles = csv.reader(file)
             in_date = []
-            # Populate list of Articles to keep with Articles less than a day old
+            # Populate list of Articles to keep with unique Articles less than a day old
             for article in articles:
-                if datetime.strptime(article[2], "%d/%m/%y %H:%M") >= day_old:
+                if datetime.strptime(article[2], "%d/%m/%y %H:%M") >= day_old and article[1] not in duplicate_articles:
                     in_date.append(article)
+                    duplicate_articles.add(article[1])
 
         # Write file of saved Classified Articles
         with open(filepath, "w") as file:
@@ -178,11 +185,6 @@ def setup_scraping():
             # Write Articles
             for article in in_date:
                 writer.writerow(article)
-
-        # Poll every 30 minutes for new articles
-        scrape_urls("BBC")
-        scrape_urls("Guardian")
-        scrape_urls("SKY")
 
         sleep(1800)
 
